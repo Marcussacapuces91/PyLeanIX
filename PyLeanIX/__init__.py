@@ -3,7 +3,6 @@
 
 import logging
 import requests
-from requests.auth import HTTPBasicAuth
 
 
 class LeanIX:
@@ -27,7 +26,7 @@ class LeanIX:
         """Return access token found using API_TOKEN"""
         response = self._session.post(
             self._instance + '/services/mtm/v1/oauth2/token',
-            auth=HTTPBasicAuth('apitoken', api_token),
+            auth=('apitoken', api_token),
             data={'grant_type': 'client_credentials'}
         )
         response.raise_for_status()
