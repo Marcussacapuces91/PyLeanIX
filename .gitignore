@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # hide secrets
-secrets.*
+my_secrets.py
