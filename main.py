@@ -12,13 +12,16 @@ from flask import Flask, escape, g, current_app
 
 def get_leanix():
     with app.app_context() as ctx:
-        if 'leanix' not in ctx:
-            ctx.leanix = PyLeanIX.LeanIX(INSTANCE, API_TOKEN, PROXIES)
-        return ctx.leanix;
+        try:
+            return current_app.leanix
+        except AttributeError:
+            current_app.leanix = PyLeanIX.LeanIX(INSTANCE, API_TOKEN)
+            print("create leanix")
+            return current_app.leanix
 
 
 app = Flask(__name__)
-# app.leanix = PyLeanIX.LeanIX(INSTANCE, API_TOKEN) #, PROXIES)
+app.leanix = PyLeanIX.LeanIX(INSTANCE, API_TOKEN) #, PROXIES)
 # print("Leanix")
 
 
