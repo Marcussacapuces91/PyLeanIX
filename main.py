@@ -41,27 +41,29 @@ def index():
             'completion': False,
             'documents': False,
             'tags': False,
-            #            'fields': False,
-            #            'subscriptions': False,
+            'fields': False,
+            'constrainingRelations': True,
+            'subscriptions': False
             #            'constrainingRelations': False
         }, cursor)
         if d:
             # print(f"Taille de la réponse : {len(d)}")
             for line in d:
                 body += "<li>\n"
-                body += f"<h2><a href=\'{INSTANCE + '/itmlive/factsheet/Application/' + line['id']}\'>" \
+                body += f"  <h2><a href=\'{INSTANCE + '/itmlive/factsheet/Application/' + line['id']}\'>" \
                         f"{line.get('display_name', line['name'])}" \
-                        "</a></h2>"
-                body += f"<p>{line.get('description', '<i>Pas de description</i>')}</p>".replace('\n', '<br/>')
+                        "</a></h2>\n"
+                body += f"  <p>{line.get('description', '<i>Pas de description</i>')}</p>\n".replace('\n', '<br/>')
 
                 if line.get('fields'):
-                    body += "<h3>Champs</h3><ul>"
+                    body += "  <h3>Champs</h3>\n"
+                    body += "  <ul>\n"
                     for f in line['fields']:
                         if f['name'] == 'externalId':
-                            body += f"<li>Code Application : {f['data']['externalId']}</li>"
-                    body += "</ul>"
+                            body += f"    <li>Code Application : {f['data']['externalId']}</li>\n"
+                    body += "  </ul>\n"
 
-                body += f'<tt>{escape(pprint.pformat(line, indent=1, width=132, sort_dicts=False))}</tt><br/>'
+                body += f'<pre>{pprint.pformat(line, indent=1, width=132, sort_dicts=False)}</pre>\n'
                 body += "</li>\n"
             cursor = c
         else:
