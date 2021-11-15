@@ -10,11 +10,12 @@ class LeanIX:
     def __init__(self, instance: str, api_token: str, proxies=None):
         """Constructor"""
         self._logger = logging.getLogger(__name__)
+        self._api_token = api_token
         self._session = requests.session()
         if proxies:
             self._session.proxies.update(proxies)
         self._instance = instance
-        self._access_token = self._get_api_token(api_token)
+        self._access_token = self._get_api_token()
 
     def __enter__(self):
         return self
@@ -22,11 +23,11 @@ class LeanIX:
     def __exit__(self, exc_type, exc_val, exc_tb):
         return
 
-    def _get_api_token(self, api_token: str) -> str:
+    def _get_api_token(self) -> str:
         """Return access token found using API_TOKEN"""
         response = self._session.post(
             self._instance + '/services/mtm/v1/oauth2/token',
-            auth=('apitoken', api_token),
+            auth=('apitoken', self._api_token),
             data={'grant_type': 'client_credentials'}
         )
         response.raise_for_status()
@@ -43,4 +44,11 @@ class LeanIX:
             },
             params=params
         )
-        return response.json()['cursor'], response.json()['data']
+        if response.ok:
+            return response.json()['cursor'], response.json()['data']
+        elif response.status_code == 401:    # obsolete token
+            self._logger.info("Renew obsolete token")
+            self._access_token = self._get_api_token()
+            return self.request(_class, params, cur)
+        else:
+            response.raise_for_status()
